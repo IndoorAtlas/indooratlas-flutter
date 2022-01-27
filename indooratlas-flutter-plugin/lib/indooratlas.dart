@@ -307,7 +307,7 @@ abstract class IAListener {
   final String name;
   const IAListener(this.name);
   void onStatus(IAStatus status, String message);
-  void onLocation(IALocation position);
+  void onLocation(IALocation location);
   void onVenue(bool enter, IAVenue venue);
   void onFloorplan(bool enter, IAFloorplan floorplan);
   void onWayfindingRoute(IARoute route, IAWayfindingRequest request);
