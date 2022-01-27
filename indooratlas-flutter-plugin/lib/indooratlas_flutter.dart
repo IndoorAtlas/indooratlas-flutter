@@ -47,7 +47,7 @@ typedef IAOnStatusCb = void Function(IAStatus status, String message);
 typedef IAOnVenueCb = void Function(bool enter, IAVenue venue);
 typedef IAOnFloorplanCb = void Function(bool enter, IAFloorplan floorplan);
 typedef IAOnWayfindingRouteCb = void Function(
-    IARoute route, IAWayfindingRequest request);
+    IARoute route, IAWayfindingRequest? request);
 typedef IAOnOrientationCb = void Function(
     double x, double y, double z, double w);
 
@@ -91,7 +91,7 @@ class IACallbackListener extends IAListener {
   }
 
   @override
-  void onWayfindingRoute(IARoute route, IAWayfindingRequest request) {
+  void onWayfindingRoute(IARoute route, IAWayfindingRequest? request) {
     onWayfindingRouteCb?.call(route, request);
   }
 

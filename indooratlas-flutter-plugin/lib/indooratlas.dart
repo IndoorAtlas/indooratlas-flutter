@@ -89,6 +89,9 @@ class IARoute {
   late final List<IARoutingLeg> legs;
   final String error;
   IARoute(this.legs, this.error);
+  IARoute.empty()
+      : legs = [],
+        error = '';
   IARoute.fromMap(Map map) : error = map['error'] {
     List<IARoutingLeg> legs = [];
     for (var leg in map['legs']) {
@@ -310,7 +313,7 @@ abstract class IAListener {
   void onLocation(IALocation location);
   void onVenue(bool enter, IAVenue venue);
   void onFloorplan(bool enter, IAFloorplan floorplan);
-  void onWayfindingRoute(IARoute route, IAWayfindingRequest request);
+  void onWayfindingRoute(IARoute route, IAWayfindingRequest? request);
   void onOrientation(double x, double y, double z, double w);
   void onHeading(double heading);
 }
@@ -418,7 +421,7 @@ class IndoorAtlas {
     if (_wayfinding != null) {
       final r = IARoute.fromMap(route);
       _currentRoute = r;
-      _listeners.forEach((l) => l.onWayfindingRoute(r, _wayfinding!));
+      _listeners.forEach((l) => l.onWayfindingRoute(r, _wayfinding));
     }
     return Future.value();
   }
@@ -431,6 +434,25 @@ class IndoorAtlas {
     }
     _permissions = granted;
     return Future.value();
+  }
+
+  static void _resetState() {
+    if (_currentFloorplan != null) {
+      _listeners.forEach((l) => l.onFloorplan(false, _currentFloorplan!));
+      _currentFloorplan = null;
+    }
+    if (_currentVenue != null) {
+      _listeners.forEach((l) => l.onVenue(false, _currentVenue!));
+      _currentVenue = null;
+    }
+    _currentLocation = null;
+  }
+
+  static void _resetWayfinding() {
+    if (_currentRoute != null) {
+      _listeners.forEach((l) => l.onWayfindingRoute(IARoute.empty(), null));
+      _currentRoute = null;
+    }
   }
 
   static void _applyOptions(IAConfiguration opts) {
@@ -470,6 +492,9 @@ class IndoorAtlas {
       });
       if (opts.apiKey != _opts.apiKey) _debug('apiKey changed');
       if (opts.endpoint != _opts.endpoint) _debug('endpoint changed');
+      _resetState();
+      _resetWayfinding();
+      _traceId = null;
       _native('initialize', ['0.0.1', opts.apiKey, opts.endpoint]);
       _debug('init done');
       _initialized = true;
@@ -478,9 +503,7 @@ class IndoorAtlas {
     if (_listeners.isEmpty) {
       _debug('stopping positioning');
       _nativeInitialized('stopPositioning');
-      _currentVenue = null;
-      _currentFloorplan = null;
-      _currentLocation = null;
+      _resetState();
     } else {
       _debug('starting positioning');
       if (opts.minChangeMeters != _opts.minChangeMeters)
@@ -506,7 +529,7 @@ class IndoorAtlas {
     if (_wayfinding == null) {
       _debug('stopping wayfinding');
       _nativeInitialized('stopWayfinding');
-      _currentRoute = null;
+      _resetWayfinding();
     } else {
       _debug('starting wayfinding');
       _nativeInitialized('startWayfinding', [
