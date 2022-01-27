@@ -2,40 +2,38 @@ import 'package:flutter/widgets.dart';
 import 'indooratlas.dart';
 
 class _IndoorAtlasListenerState extends State<IndoorAtlasListener> {
-  void _enable() {
-    if (widget.configuration != null) {
-      // NOTE: Overrides any other configuration!
-      //       IndoorAtlas configurations are global!
-      IndoorAtlas.configure(widget.configuration!);
+  void _enable(IAListener? old) {
+    if (widget.enabled) {
+      if (widget.configuration != null) {
+        // NOTE: Overrides any other configuration!
+        //       IndoorAtlas configurations are global!
+        IndoorAtlas.configure(widget.configuration!);
+      }
+      if (old != null) {
+        IndoorAtlas.resubscribe(old, widget.listener);
+      } else {
+        IndoorAtlas.subscribe(widget.listener);
+      }
+    } else if (old != null) {
+      IndoorAtlas.unsubscribe(old);
     }
-    IndoorAtlas.subscribe(widget.listener);
   }
 
   @override
   void initState() {
     super.initState();
-    if (widget.enabled) {
-      _enable();
-    }
+    _enable(null);
   }
 
   @override
   void didUpdateWidget(IndoorAtlasListener old) {
     super.didUpdateWidget(old);
-    if (widget.enabled != old.enabled && old.enabled) {
-      if (widget.enabled) {
-        _enable();
-      } else {
-        IndoorAtlas.unsubscribe(widget.listener);
-      }
-    }
+    _enable(old.listener);
   }
 
   @override
   void dispose() {
-    if (widget.enabled) {
-      IndoorAtlas.unsubscribe(widget.listener);
-    }
+    IndoorAtlas.unsubscribe(widget.listener);
     super.dispose();
   }
 

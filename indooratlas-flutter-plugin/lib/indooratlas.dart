@@ -342,6 +342,12 @@ class IndoorAtlas {
   static List<IAListener> _listeners = [];
   static IAWayfindingRequest? _wayfinding;
 
+  // Saved for new subscribers to immediately know the state
+  static IAVenue? _currentVenue;
+  static IAFloorplan? _currentFloorplan;
+  static IALocation? _currentLocation;
+  static IARoute? _currentRoute;
+
   static void _debug(String msg) {
     if (debugEnabled) print('IndoorAtlas DEBUG: ${msg}');
   }
@@ -369,15 +375,19 @@ class IndoorAtlas {
   }
 
   static Future<void> _onLocationChanged(Map location) {
-    _listeners.forEach((l) => l.onLocation(IALocation.fromMap(location)));
+    final loc = IALocation.fromMap(location);
+    _currentLocation = loc;
+    _listeners.forEach((l) => l.onLocation(loc));
     return Future.value();
   }
 
   static void _dispatchRegionEvent(bool enter, _Region region) {
     if (region.venue != null) {
+      _currentVenue = (enter ? region.venue : null);
       _listeners.forEach((l) => l.onVenue(enter, region.venue!));
     }
     if (region.floorplan != null) {
+      _currentFloorplan = (enter ? region.floorplan : null);
       _listeners.forEach((l) => l.onFloorplan(enter, region.floorplan!));
     }
   }
@@ -406,8 +416,9 @@ class IndoorAtlas {
   static Future<void> _onWayfindingUpdate(Map route) {
     // should not happen, but check anyway
     if (_wayfinding != null) {
-      _listeners.forEach(
-          (l) => l.onWayfindingRoute(IARoute.fromMap(route), _wayfinding!));
+      final r = IARoute.fromMap(route);
+      _currentRoute = r;
+      _listeners.forEach((l) => l.onWayfindingRoute(r, _wayfinding!));
     }
     return Future.value();
   }
@@ -467,6 +478,9 @@ class IndoorAtlas {
     if (_listeners.isEmpty) {
       _debug('stopping positioning');
       _nativeInitialized('stopPositioning');
+      _currentVenue = null;
+      _currentFloorplan = null;
+      _currentLocation = null;
     } else {
       _debug('starting positioning');
       if (opts.minChangeMeters != _opts.minChangeMeters)
@@ -492,6 +506,7 @@ class IndoorAtlas {
     if (_wayfinding == null) {
       _debug('stopping wayfinding');
       _nativeInitialized('stopWayfinding');
+      _currentRoute = null;
     } else {
       _debug('starting wayfinding');
       _nativeInitialized('startWayfinding', [
@@ -529,12 +544,35 @@ class IndoorAtlas {
       if (l == listener) return;
     }
     _listeners.add(listener);
+
+    // send current state
+    if (_currentVenue != null) {
+      listener.onVenue(true, _currentVenue!);
+    }
+    if (_currentFloorplan != null) {
+      listener.onFloorplan(true, _currentFloorplan!);
+    }
+    if (_currentLocation != null) {
+      listener.onLocation(_currentLocation!);
+    }
+    if (_wayfinding != null && _currentRoute != null) {
+      listener.onWayfindingRoute(_currentRoute!, _wayfinding!);
+    }
+
     _applyOptions(_opts);
   }
 
   static void unsubscribe(IAListener listener) {
     _listeners.removeWhere((l) => l == listener);
     _applyOptions(_opts);
+  }
+
+  static void resubscribe(IAListener old, IAListener listener) {
+    _listeners.removeWhere((l) => l == old);
+    for (var l in _listeners) {
+      if (l == listener) return;
+    }
+    _listeners.add(listener);
   }
 
   static void startWayfindingTo(IAWayfindingRequest request) {
