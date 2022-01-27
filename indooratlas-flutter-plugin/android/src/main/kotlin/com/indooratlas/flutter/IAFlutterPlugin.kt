@@ -261,10 +261,11 @@ class IAFlutterEngine (context: Context, channel: MethodChannel): IALocationList
     return true
   }
 
-  fun destroy() {
+  fun detach() {
     _handler.post {
       if (_locationManager != null) {
         _locationManager?.destroy()
+        _locationManager = null;
       }
     }
     _channel.setMethodCallHandler(null)
@@ -465,7 +466,7 @@ class IAFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
   }
 
   override fun onDetachedFromEngine(@NonNull binding: FlutterPlugin.FlutterPluginBinding) {
-    _engine.destroy()
+    _engine.detach();
     _engine.activityBinding = null
   }
 }
