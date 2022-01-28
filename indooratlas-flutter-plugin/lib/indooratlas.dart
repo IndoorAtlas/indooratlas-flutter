@@ -351,7 +351,7 @@ class IndoorAtlas {
   static String? _traceId;
 
   // Listeners subscribed for IA callbacks
-  static List<IAListener> _listeners = [];
+  static var _listeners = Set<IAListener>.identity();
 
   // TODO: Get rid of global wayfinding and use requestWayfindingRoute instead
   //       This allows us to move this to IAListener, and get rid of some state
@@ -576,9 +576,7 @@ class IndoorAtlas {
   }
 
   static void subscribe(IAListener listener) {
-    for (var l in _listeners) {
-      if (l == listener) return;
-    }
+    if (_listeners.contains(listener)) return;
     _listeners.add(listener);
 
     // send current state
@@ -599,15 +597,13 @@ class IndoorAtlas {
   }
 
   static void unsubscribe(IAListener listener) {
-    _listeners.removeWhere((l) => l == listener);
+    if (!_listeners.contains(listener)) return;
+    _listeners.remove(listener);
     _applyOptions(_opts);
   }
 
   static void resubscribe(IAListener old, IAListener listener) {
-    _listeners.removeWhere((l) => l == old);
-    for (var l in _listeners) {
-      if (l == listener) return;
-    }
+    _listeners.remove(old);
     _listeners.add(listener);
   }
 
