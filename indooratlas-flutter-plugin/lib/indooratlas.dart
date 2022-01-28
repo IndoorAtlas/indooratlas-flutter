@@ -562,9 +562,11 @@ class IndoorAtlas {
     _applyOptions(options);
   }
 
-  static IAConfiguration get currentConfiguration => _givenOpts;
-
+  static IAConfiguration get configuration => _givenOpts;
   static String? get traceId => _traceId;
+  static String? get venue => _currentVenue;
+  static String? get floorplan => _currentFloorplan;
+  static String? get location => _currentLocation;
 
   static void setLocation(IACoordinate coordinate) {
     IALocation pos;
