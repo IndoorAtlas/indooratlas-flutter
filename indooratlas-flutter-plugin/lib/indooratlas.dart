@@ -308,6 +308,8 @@ class IAWayfindingRequest {
 
 abstract class IAListener {
   final String name;
+  // TODO: add IAWayfindingRequest
+  // TODO: add IAGeofence array (for dynamic geofences)
   const IAListener(this.name);
   void onStatus(IAStatus status, String message);
   void onLocation(IALocation location);
@@ -326,26 +328,37 @@ class IndoorAtlas {
     return _ch.invokeMethod<T>(method, arguments);
   }
 
-  static bool _initialized = false;
-  static bool _permissions = false;
+  // Debug print toggle
   static bool debugEnabled = false;
 
-  // currently applied configuration
+  // Has the SDK be initialized?
+  static bool _initialized = false;
+
+  // Has permissions been requested?
+  static bool _permissions = false;
+
+  // Currently applied configuration
   static IAConfiguration _opts = IAConfiguration(apiKey: '');
 
-  // given configuration to configure
+  // Given configuration to configure
   // this is usually same as _opts, but may be briefly out of sync when new
   // configuration is given, as applying configuration can take few seconds we
   // hide this latency by returning always _givenOpts in static configuration
   // getter
   static IAConfiguration _givenOpts = IAConfiguration(apiKey: '');
 
+  // Latest trace id is cached here
   static String? _traceId;
 
+  // Listeners subscribed for IA callbacks
   static List<IAListener> _listeners = [];
+
+  // TODO: Get rid of global wayfinding and use requestWayfindingRoute instead
+  //       This allows us to move this to IAListener, and get rid of some state
   static IAWayfindingRequest? _wayfinding;
 
-  // Saved for new subscribers to immediately know the state
+  // Stored current state
+  // We send the current state to any new listener
   static IAVenue? _currentVenue;
   static IAFloorplan? _currentFloorplan;
   static IALocation? _currentLocation;
@@ -598,6 +611,10 @@ class IndoorAtlas {
     _listeners.add(listener);
   }
 
+  // TODO: Get rid of the global wayfinding and use requestWayfindingRoute instead
+  //       IAWayfindingRequest will be a IAListener member
+  //       This way we get rid of some global state
+
   static void startWayfindingTo(IAWayfindingRequest request) {
     if (_wayfinding == request) return;
     _wayfinding = request;
@@ -612,10 +629,4 @@ class IndoorAtlas {
     _wayfinding = null;
     _applyOptions(_opts);
   }
-
-  static void requestWayfindingRoute() {}
-
-  static void addDynamicGeofence() {}
-
-  static void removeDynamicGeofence() {}
 }
