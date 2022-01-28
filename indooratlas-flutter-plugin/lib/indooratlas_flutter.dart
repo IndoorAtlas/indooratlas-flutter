@@ -4,11 +4,6 @@ import 'indooratlas.dart';
 class _IndoorAtlasListenerState extends State<IndoorAtlasListener> {
   void _enable(IAListener? old) {
     if (widget.enabled) {
-      if (widget.configuration != null) {
-        // NOTE: Overrides any other configuration!
-        //       IndoorAtlas configurations are global!
-        IndoorAtlas.configure(widget.configuration!);
-      }
       if (old != null) {
         IndoorAtlas.resubscribe(old, widget.listener);
       } else {
@@ -109,14 +104,12 @@ class IACallbackListener extends IAListener {
 class IndoorAtlasListener extends StatefulWidget {
   final Widget child;
   final IACallbackListener listener;
-  final IAConfiguration? configuration;
   final bool enabled;
   IndoorAtlasListener({
     Key? key,
     required String name,
     this.enabled = true,
     this.child = const SizedBox.shrink(),
-    this.configuration = null,
     IAOnStatusCb? onStatus,
     ValueSetter<IALocation>? onLocation,
     IAOnVenueCb? onVenue,

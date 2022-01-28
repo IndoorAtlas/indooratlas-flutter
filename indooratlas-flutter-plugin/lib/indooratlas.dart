@@ -310,10 +310,6 @@ abstract class IAListener {
   final String name;
   // TODO: add IAWayfindingRequest
   // TODO: add IAGeofence array (for dynamic geofences)
-  // XXX: can we make IAConfiguration a member?
-  //      idea would be to check all listeners IAConfiguration and derive a single global config that makes sense
-  //      if there's conflicts such as apikey, endpoint or positioning mode throw a error
-  //      this would reduce even more state and make the API very simple and atomic
   const IAListener(this.name);
   void onStatus(IAStatus status, String message);
   void onLocation(IALocation location);
