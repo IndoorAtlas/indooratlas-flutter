@@ -200,6 +200,9 @@ class IAFlutterEngine (context: Context, channel: MethodChannel): IALocationList
   private var _locationServiceRunning = false
 
   private val PERMISSION_REQUEST_CODE = 444444
+
+  // TODO: Handle BLUETOOTH_SCAN (android 12) somehow
+  //       https://github.com/IndoorAtlas/android-sdk/pull/609
   private val PERMISSIONS = arrayOf(
     Manifest.permission.CHANGE_WIFI_STATE,
     Manifest.permission.ACCESS_WIFI_STATE,
