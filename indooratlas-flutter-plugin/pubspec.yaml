@@ -1,7 +1,7 @@
 name: indooratlas
-description: A new flutter plugin project.
+description: Develop Flutter applications powered with the IndoorAtlas indoor positioning technology.
 version: 0.0.1
-homepage:
+homepage: https://indooratlas.com/
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
@@ -10,6 +10,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  indooratlas_flutter:
+    path: ios
 
 dev_dependencies:
   flutter_test:
@@ -20,6 +22,4 @@ flutter:
     platforms:
       android:
         package: com.indooratlas.flutter
-        pluginClass: IAFlutterPlugin
-      ios:
         pluginClass: IAFlutterPlugin
