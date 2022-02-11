@@ -265,17 +265,16 @@ class IAFlutterEngine (context: Context, channel: MethodChannel): IALocationList
     activityBinding?.getActivity()?.requestPermissions(PERMISSIONS, PERMISSION_REQUEST_CODE)
   }
 
-  fun initialize(pluginVersion: String, @NonNull apiKey: String, endpoint: String) {
+  fun initialize(@NonNull pluginVersion: String, @NonNull apiKey: String, @NonNull endpoint: String) {
+   assert(pluginVersion.length > 0) { "plugin version should not be empty" }
     _handler.post {
       val bundle = Bundle(2)
       bundle.putString(IALocationManager.EXTRA_API_KEY, apiKey)
       bundle.putString(IALocationManager.EXTRA_API_SECRET, "not-used-in-the-flutter-plugin")
       bundle.putString("com.indooratlas.android.sdk.intent.extras.wrapperName", "flutter")
-      if (endpoint != null && endpoint.length > 0) {
+      bundle.putString("com.indooratlas.android.sdk.intent.extras.wrapperVersion", pluginVersion)
+      if (endpoint.length > 0) {
         bundle.putString("com.indooratlas.android.sdk.intent.extras.restEndpoint", endpoint);
-      }
-      if (pluginVersion != null && pluginVersion.length > 0) {
-        bundle.putString("com.indooratlas.android.sdk.intent.extras.wrapperVersion", pluginVersion)
       }
       if (_locationManager != null) {
         _locationManager?.destroy()

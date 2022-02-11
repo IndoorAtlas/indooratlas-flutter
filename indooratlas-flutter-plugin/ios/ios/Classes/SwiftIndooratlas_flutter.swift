@@ -172,8 +172,8 @@ private func IARoute2Map(route: IARoute) -> [String:Any] {
 }
 
 public class SwiftIAFlutterPlugin: NSObject, FlutterPlugin, IALocationManagerDelegate {
-    var _locationManager = IALocationManager.sharedInstance()
-    var _locationServiceRunning = false
+    private var _locationManager = IALocationManager.sharedInstance()
+    private var _locationServiceRunning = false
     private static var CHANNEL:FlutterMethodChannel? = nil
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -219,18 +219,17 @@ public class SwiftIAFlutterPlugin: NSObject, FlutterPlugin, IALocationManagerDel
     }
     
     func initialize(pluginVersion: String, apiKey: String, endpoint: String) {
-        let selector = NSSelectorFromString("setObject:forKey:")
-        _locationManager.setApiKey(apiKey, andSecret: "not-used-in-the-flutter-plugin")
+        assert(!pluginVersion.isEmpty)
+        _locationManager.delegate = self
+        _locationManager.setObject([
+            "name": "flutter",
+            "version": pluginVersion
+        ], forKey: "IAWrapper")
         if !endpoint.isEmpty {
-            _locationManager.perform(selector, with:endpoint, with: "IACustomEndpoint")
+            _locationManager.setObject(endpoint, forKey: "IACustomEndpoint")
         }
-        var wrapper = [
-            "name": "flutter"
-        ]
-        if !pluginVersion.isEmpty {
-            wrapper["version"] = pluginVersion
-        }
-        _locationManager.perform(selector, with:wrapper, with: "IAWrapper")
+        // setApiKey must be called last
+        _locationManager.setApiKey(apiKey, andSecret: "not-used-in-the-flutter-plugin")
         _locationServiceRunning = false
     }
     
@@ -287,13 +286,11 @@ public class SwiftIAFlutterPlugin: NSObject, FlutterPlugin, IALocationManagerDel
     }
     
     func startPositioning() {
-        _locationManager.delegate = self
         _locationManager.startUpdatingLocation()
         _locationServiceRunning = true
     }
     
     func stopPositioning() {
-        _locationManager.delegate = nil
         _locationManager.stopUpdatingLocation()
         _locationServiceRunning = false
     }
