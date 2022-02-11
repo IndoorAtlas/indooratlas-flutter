@@ -150,6 +150,7 @@ private func IARoute2Map(route: IARoute) -> [String:Any] {
         return [
             "begin": IARoutePoint2Map(rp: leg.begin),
             "end": IARoutePoint2Map(rp: leg.end),
+            "length": leg.length,
             "direction": leg.direction,
             "edgeIndex": leg.edgeIndex
         ]
