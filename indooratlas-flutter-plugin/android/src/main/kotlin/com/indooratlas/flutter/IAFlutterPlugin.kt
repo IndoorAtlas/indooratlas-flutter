@@ -41,31 +41,28 @@ class IAFlutterResult {
 private fun IAPOI2Map(poi: IAPOI): Map<String, Any> {
   return mapOf(
     "type" to "Feature",
-    "id" to poi.getId(),
+    "id" to poi.id,
     "properties" to mapOf(
-      "name" to poi.getName(),
-      "floor" to poi.getFloor(),
-      "payload" to poi.getPayload().toString()
+      "name" to poi.name,
+      "floor" to poi.floor,
+      "payload" to poi.payload.toString()
     ),
     "geometry" to mapOf(
       "type" to "Point",
-      "coordinates" to listOf(poi.getLocation().longitude, poi.getLocation().latitude)
+      "coordinates" to listOf(poi.location.longitude, poi.location.latitude)
     )
   )
 }
 
 private fun IAGeofence2Map(geofence: IAGeofence): Map<String, Any> {
-  var vertices: List<Double> = listOf()
-  for (edge in geofence.getEdges()) {
-    vertices += listOf(edge[1], edge[0])
-  }
+  var vertices: List<Double> = geofence.edges.flatMap { listOf(it[1], it[0]) }
   return mapOf(
     "type" to "Feature",
-    "id" to geofence.getId(),
+    "id" to geofence.id,
     "properties" to mapOf(
-      "name" to geofence.getName(),
-      "floor" to geofence.getFloor(),
-      "payload" to geofence.getPayload().toString()
+      "name" to geofence.name,
+      "floor" to geofence.floor,
+      "payload" to geofence.payload.toString()
     ),
     "geometry" to mapOf(
       "type" to "Polygon",
@@ -76,102 +73,91 @@ private fun IAGeofence2Map(geofence: IAGeofence): Map<String, Any> {
 
 private fun IAFloorplan2Map(floorplan: IAFloorPlan): Map<String, Any> {
   return mapOf(
-    "id" to floorplan.getId(),
-    "name" to floorplan.getName(),
-    "url" to floorplan.getUrl(),
-    "floorLevel" to floorplan.getFloorLevel(),
-    "bearing" to floorplan.getBearing(),
-    "bitmapWidth" to floorplan.getBitmapWidth(),
-    "bitmapHeight" to floorplan.getBitmapHeight(),
-    "widthMeters" to floorplan.getWidthMeters(),
-    "heightMeters" to floorplan.getHeightMeters(),
-    "metersToPixels" to floorplan.getMetersToPixels(),
-    "pixelsToMeters" to floorplan.getPixelsToMeters(),
-    "bottomLeft" to listOf(floorplan.getBottomLeft().longitude, floorplan.getBottomLeft().latitude),
-    "center" to listOf(floorplan.getCenter().longitude, floorplan.getCenter().latitude),
-    "topLeft" to listOf(floorplan.getTopLeft().longitude, floorplan.getTopLeft().latitude),
-    "topRight" to listOf(floorplan.getTopRight().longitude, floorplan.getTopRight().latitude)
+    "id" to floorplan.id,
+    "name" to floorplan.name,
+    "url" to floorplan.url,
+    "floorLevel" to floorplan.floorLevel,
+    "bearing" to floorplan.bearing,
+    "bitmapWidth" to floorplan.bitmapWidth,
+    "bitmapHeight" to floorplan.bitmapHeight,
+    "widthMeters" to floorplan.widthMeters,
+    "heightMeters" to floorplan.heightMeters,
+    "metersToPixels" to floorplan.metersToPixels,
+    "pixelsToMeters" to floorplan.pixelsToMeters,
+    "bottomLeft" to listOf(floorplan.bottomLeft.longitude, floorplan.bottomLeft.latitude),
+    "center" to listOf(floorplan.center.longitude, floorplan.center.latitude),
+    "topLeft" to listOf(floorplan.topLeft.longitude, floorplan.topLeft.latitude),
+    "topRight" to listOf(floorplan.topRight.longitude, floorplan.topRight.latitude)
   )
 }
 
 private fun IAVenue2Map(venue: IAVenue): Map<String, Any> {
   var map = mutableMapOf<String, Any>(
-    "id" to venue.getId(),
-    "name" to venue.getName()
+    "id" to venue.id,
+    "name" to venue.name
   )
-  var plans: List<Map<String, Any>> = listOf()
-  for (plan in venue.getFloorPlans()) {
-    plans += IAFloorplan2Map(plan)
-  }
-  if (plans.size > 0) map["floorPlans"] = plans
-  var fences: List<Map<String, Any>> = listOf()
-  for (fence in venue.getGeofences()) {
-    fences += IAGeofence2Map(fence)
-  }
-  if (fences.size > 0) map["geofences"] = fences
-  var pois: List<Map<String, Any>> = listOf()
-  for (poi in venue.getPOIs()) {
-    pois += IAPOI2Map(poi)
-  }
-  if (pois.size > 0) map["pois"] = pois
+  var plans: List<Map<String, Any>> = venue.floorPlans.map { IAFloorplan2Map(it) }
+  if (plans.isNotEmpty()) map["floorPlans"] = plans
+  var fences: List<Map<String, Any>> = venue.geofences.map { IAGeofence2Map(it) }
+  if (fences.isNotEmpty()) map["geofences"] = fences
+  var pois: List<Map<String, Any>> = venue.poIs.map { IAPOI2Map(it) }
+  if (pois.isNotEmpty()) map["pois"] = pois
   return map
 }
 
 private fun IARegion2Map(region: IARegion): Map<String, Any> {
   var map = mutableMapOf<String, Any>(
-    "regionId" to region.getId(),
-    "timestamp" to region.getTimestamp(),
-    "regionType" to region.getType()
+    "regionId" to region.id,
+    "timestamp" to region.timestamp,
+    "regionType" to region.type
   )
   if (region.getFloorPlan() != null) {
-    map["floorPlan"] = IAFloorplan2Map(region.getFloorPlan());
+    map["floorPlan"] = IAFloorplan2Map(region.floorPlan);
   }
   if (region.getVenue() != null) {
-    map["venue"] = IAVenue2Map(region.getVenue());
+    map["venue"] = IAVenue2Map(region.venue);
   }
   return map
 }
 
 private fun IALocation2Map(location: IALocation): Map<String, Any> {
-  var map = mutableMapOf<String, Any>(
-    "latitude" to location.getLatitude(),
-    "longitude" to location.getLongitude(),
-    "accuracy" to location.getAccuracy(),
-    "altitude" to location.getAltitude(),
-    "heading" to location.getBearing(),
-    "floorCertainty" to location.getFloorCertainty(),
-    "flr" to location.getFloorLevel(),
-    "velocity" to location.toLocation().getSpeed(),
-    "timestamp" to location.getTime()
+  var map = mutableMapOf(
+    "latitude" to location.latitude,
+    "longitude" to location.longitude,
+    "accuracy" to location.accuracy,
+    "altitude" to location.altitude,
+    "heading" to location.bearing,
+    "floorCertainty" to location.floorCertainty,
+    "flr" to location.floorLevel,
+    "velocity" to location.toLocation().speed,
+    "timestamp" to location.time
   )
-  if (location.getRegion() != null) {
-    map["region"] = IARegion2Map(location.getRegion());
+  if (location.region != null) {
+    map["region"] = IARegion2Map(location.region);
   }
   return map
 }
 
 private fun IARoutePoint2Map(rp: IARoute.Point): Map<String, Any> {
-   return mapOf<String, Any>(
-      "latitude" to rp.getLatitude(),
-      "longitude" to rp.getLongitude(),
-      "floor" to rp.getFloor()
+   return mapOf(
+      "latitude" to rp.latitude,
+      "longitude" to rp.longitude,
+      "floor" to rp.floor
    )
 }
 
 private fun IARoute2Map(route: IARoute): Map<String, Any> {
-   var legs: List<Map<String, Any>> = listOf()
-   for (leg in route.getLegs()) {
-      legs += mapOf<String, Any>(
-         "begin" to IARoutePoint2Map(leg.getBegin()),
-         "end" to IARoutePoint2Map(leg.getEnd()),
-         "length" to leg.getLength(),
-         "direction" to leg.getDirection(),
-         "edgeIndex" to (leg.getEdgeIndex() ?: -1)
-      )
+   var legs: List<Map<String, Any>> = route.legs.map { leg ->
+     mapOf(
+         "begin" to IARoutePoint2Map(leg.begin),
+         "end" to IARoutePoint2Map(leg.end),
+         "length" to leg.length,
+         "direction" to leg.direction,
+         "edgeIndex" to (leg.edgeIndex ?: -1))
    }
-   return mapOf<String, Any>(
+   return mapOf(
       "legs" to legs,
-      "error" to route.getError().name
+      "error" to route.error.name
    )
 }
 
