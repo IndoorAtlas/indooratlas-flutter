@@ -133,6 +133,11 @@ private func IALocation2Map(location: IALocation) -> [String:Any] {
     ]
     if let region = location.region {
         map["region"] = IARegion2Map(region:region)
+        if let fp = region.floorplan {
+           let point = fp.coordinate(toPoint: clLoc.coordinate)
+           map["pix_x"] = point.x
+           map["pix_y"] = point.y
+        }
     }
     return map
 }

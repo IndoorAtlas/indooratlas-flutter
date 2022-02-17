@@ -111,17 +111,17 @@ private fun IARegion2Map(region: IARegion): Map<String, Any> {
     "timestamp" to region.timestamp,
     "regionType" to region.type
   )
-  if (region.getFloorPlan() != null) {
+  if (region.floorPlan != null) {
     map["floorPlan"] = IAFloorplan2Map(region.floorPlan);
   }
-  if (region.getVenue() != null) {
+  if (region.venue != null) {
     map["venue"] = IAVenue2Map(region.venue);
   }
   return map
 }
 
 private fun IALocation2Map(location: IALocation): Map<String, Any> {
-  var map = mutableMapOf(
+  var map = mutableMapOf<String, Any>(
     "latitude" to location.latitude,
     "longitude" to location.longitude,
     "accuracy" to location.accuracy,
@@ -133,7 +133,12 @@ private fun IALocation2Map(location: IALocation): Map<String, Any> {
     "timestamp" to location.time
   )
   if (location.region != null) {
-    map["region"] = IARegion2Map(location.region);
+    map["region"] = IARegion2Map(location.region)
+    if (location.region.floorPlan != null) {
+      val point = location.region.floorPlan.coordinateToPoint(location.latLngFloor)
+      map["pix_x"] = point.x
+      map["pix_y"] = point.y
+    }
   }
   return map
 }

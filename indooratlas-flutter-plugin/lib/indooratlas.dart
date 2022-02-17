@@ -10,7 +10,17 @@ class IACoordinate {
         longitude = 0;
 }
 
+class IAPoint {
+  final double x, y;
+  const IAPoint(this.x, this.y);
+  const IAPoint.zero()
+      : x = 0,
+        y = 0;
+}
+
 class IALocation extends IACoordinate {
+  late final IAPoint? pixel;
+  late final IAFloorplan? floorplan;
   final double accuracy;
   final double heading;
   final double altitude;
@@ -28,7 +38,9 @@ class IALocation extends IACoordinate {
     this.floorCertainty = 0,
     this.velocity = 0,
     required this.timestamp,
-  }) : super(latitude, longitude);
+  })  : pixel = null,
+        floorplan = null,
+        super(latitude, longitude);
   IALocation.fromCoordinate(
     IACoordinate coordinate, {
     this.accuracy = 0,
@@ -38,7 +50,9 @@ class IALocation extends IACoordinate {
     this.floorCertainty = 0,
     this.velocity = 0,
     required this.timestamp,
-  }) : super(coordinate.latitude, coordinate.longitude);
+  })  : pixel = null,
+        floorplan = null,
+        super(coordinate.latitude, coordinate.longitude);
   IALocation.fromMap(Map map)
       : accuracy = map['accuracy'],
         heading = map['heading'],
@@ -47,7 +61,14 @@ class IALocation extends IACoordinate {
         floorCertainty = map['floorCertainty'],
         velocity = map['velocity'],
         timestamp = DateTime.fromMillisecondsSinceEpoch(map['timestamp']),
-        super(map['latitude'], map['longitude']);
+        super(map['latitude'], map['longitude']) {
+    if (map.containsKey('region')) {
+      this.floorplan = _Region.fromMap(map['region']).floorplan;
+    }
+    if (map.containsKey('pix_x') && map.containsKey('pix_y')) {
+      this.pixel = IAPoint(map['pix_x'], map['pix_y']);
+    }
+  }
 }
 
 enum IAStatus {
@@ -177,6 +198,22 @@ class IAFloorplan {
         center = IACoordinate(map['center'][1], map['center'][0]),
         topLeft = IACoordinate(map['topLeft'][1], map['topLeft'][0]),
         topRight = IACoordinate(map['topRight'][1], map['topRight'][0]);
+
+  Future<IAPoint> pointFromCoordinate(IACoordinate coord) async {
+    // TODO: native side not implemented
+    throw ('not implemented');
+    final r = await IndoorAtlas._nativeInitialized<List<double>>(
+        'pointFromCoordinate', [this.id, coord.latitude, coord.longitude]);
+    return IAPoint(r![0], r[1]);
+  }
+
+  Future<IACoordinate> coordinateFromPoint(IAPoint point) async {
+    // TODO: native side not implemented
+    throw ('not implemented');
+    final r = await IndoorAtlas._nativeInitialized<List<double>>(
+        'coordinateFromPoint', [this.id, point.x, point.y]);
+    return IACoordinate(r![0], r[1]);
+  }
 }
 
 class IAVenue {
