@@ -66,7 +66,7 @@ private fun IAGeofence2Map(geofence: IAGeofence): Map<String, Any> {
     ),
     "geometry" to mapOf(
       "type" to "Polygon",
-      "coordinates" to listOf(vertices)
+      "coordinates" to listOf(listOf(vertices))
     )
   )
 }

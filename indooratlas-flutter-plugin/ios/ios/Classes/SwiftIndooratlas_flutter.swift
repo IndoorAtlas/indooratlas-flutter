@@ -38,14 +38,21 @@ private func IAGeofence2Map(geofence: IAGeofence) -> [String:Any] {
             properties["payload"] = String(data: jsonData, encoding: .utf8)
         }
     }
-    
+
+    // lat, lon -> lon, lat
+    var points = [Double]()
+    for i in stride(from: 0, to: geofence.points.count, by: 2) {
+       points.append(geofence.points[i + 1] as! Double);
+       points.append(geofence.points[i + 0] as! Double);
+    }
+
     return [
         "type": "Feature",
         "id": geofence.identifier,
         "properties": properties,
         "geometry": [
             "type": "Polygon",
-            "coordinates": geofence.points
+            "coordinates": [[points]]
         ]
     ]
 }
