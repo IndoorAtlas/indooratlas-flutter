@@ -1,6 +1,10 @@
 # IndoorAtlas Flutter Plugin
 
-Use the IndoorAtlas SDK through flutter/dart
+IndoorAtlas SDK for flutter/dart, easily develop cross-platform applications
+
+This project is still under development
+
+Easily integratable UI and map widgets will come later
 
 ## Getting Started
 
