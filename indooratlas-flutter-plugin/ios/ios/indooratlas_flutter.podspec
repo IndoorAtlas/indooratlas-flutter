@@ -12,7 +12,7 @@ Pod::Spec.new do |s|
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
-  s.dependency 'IndoorAtlas', '3.4.11'
+  s.dependency 'IndoorAtlas', '3.4.12'
   s.platform = :ios, '9.0'
   # Flutter.framework does not contain a i386 slice.
   s.pod_target_xcconfig = {
