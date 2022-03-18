@@ -8,6 +8,15 @@ Easily integratable UI and map widgets will come later
 
 ## Getting Started
 
+Add this to your pubspec.yaml
+```
+indooratlas:
+  git:
+      url: https://github.com/IndoorAtlas/indooratlas-flutter.git
+      ref: develop
+      path: indooratlas-flutter-plugin
+```
+
 This project is a starting point for a Flutter
 [plug-in package](https://flutter.dev/developing-packages/),
 a specialized package that includes platform-specific implementation code for
