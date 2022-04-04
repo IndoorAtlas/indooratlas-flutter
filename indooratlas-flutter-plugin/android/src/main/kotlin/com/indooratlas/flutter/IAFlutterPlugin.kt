@@ -85,6 +85,7 @@ private fun IAFloorplan2Map(floorplan: IAFloorPlan): Map<String, Any> {
     "metersToPixels" to floorplan.metersToPixels,
     "pixelsToMeters" to floorplan.pixelsToMeters,
     "bottomLeft" to listOf(floorplan.bottomLeft.longitude, floorplan.bottomLeft.latitude),
+    "bottomRight" to listOf(floorplan.bottomRight.longitude, floorplan.bottomRight.latitude),
     "center" to listOf(floorplan.center.longitude, floorplan.center.latitude),
     "topLeft" to listOf(floorplan.topLeft.longitude, floorplan.topLeft.latitude),
     "topRight" to listOf(floorplan.topRight.longitude, floorplan.topRight.latitude)

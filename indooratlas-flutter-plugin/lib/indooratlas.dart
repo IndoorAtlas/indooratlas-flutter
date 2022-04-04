@@ -179,6 +179,7 @@ class IAFloorplan {
   final double metersToPixels;
   final double pixelsToMeters;
   final IACoordinate bottomLeft;
+  final IACoordinate bottomRight;
   final IACoordinate center;
   final IACoordinate topLeft;
   final IACoordinate topRight;
@@ -195,6 +196,8 @@ class IAFloorplan {
         metersToPixels = map['metersToPixels'],
         pixelsToMeters = map['pixelsToMeters'],
         bottomLeft = IACoordinate(map['bottomLeft'][1], map['bottomLeft'][0]),
+        bottomRight =
+            IACoordinate(map['bottomRight'][1], map['bottomRight'][0]),
         center = IACoordinate(map['center'][1], map['center'][0]),
         topLeft = IACoordinate(map['topLeft'][1], map['topLeft'][0]),
         topRight = IACoordinate(map['topRight'][1], map['topRight'][0]);
