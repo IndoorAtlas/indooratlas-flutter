@@ -8,7 +8,7 @@ Easily integratable UI and map widgets will come later
 
 ## Getting Started
 
-Add this to your pubspec.yaml
+Add this to your `pubspec.yaml`
 ```
 indooratlas:
   git:
@@ -16,6 +16,11 @@ indooratlas:
       ref: develop
       path: indooratlas-flutter-plugin
 ```
+
+In your `android/app/build.gradle` change:
+`flutter.compileSdkVersion` to `31`
+`flutter.minSdkVersion` to `21`
+`flutter.targetSdkVersion` to `30`
 
 This project is a starting point for a Flutter
 [plug-in package](https://flutter.dev/developing-packages/),
