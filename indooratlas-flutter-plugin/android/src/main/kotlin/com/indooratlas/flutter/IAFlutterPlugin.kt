@@ -455,7 +455,7 @@ class IAFlutterPlugin: FlutterPlugin, MethodCallHandler, ActivityAware {
       }
     } catch (e: Exception) {
       e.printStackTrace()
-      result.error(e.message, e.getStackTrace().toString(), null)
+      result.error(e.message!!, e.getStackTrace().toString(), null)
     }
   }
 
