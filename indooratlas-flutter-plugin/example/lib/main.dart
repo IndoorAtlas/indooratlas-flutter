@@ -81,6 +81,9 @@ class _ExamplePageState extends State<ExamplePage> {
       appBar: AppBar(title: const Text('IndoorAtlas Flutter example')),
       body: IndoorAtlasListener(
         name: 'com.indooratlas.flutter.example',
+        // A new key on every toggle makes the listener go through subscribe() (which
+        // starts positioning) instead of resubscribe() when it is enabled again.
+        key: ValueKey(_running),
         enabled: _running,
         onStatus: (status, message) => setState(() {
           _status = status;
