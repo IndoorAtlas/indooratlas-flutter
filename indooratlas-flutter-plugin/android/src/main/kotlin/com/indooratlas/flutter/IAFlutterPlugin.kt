@@ -1,6 +1,7 @@
 package com.indooratlas.flutter
 
 import androidx.annotation.NonNull
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -193,14 +194,19 @@ class IAFlutterEngine (context: Context, channel: MethodChannel): IALocationList
 
   private val PERMISSION_REQUEST_CODE = 444444
 
-  // TODO: Handle BLUETOOTH_SCAN (android 12) somehow
-  //       https://github.com/IndoorAtlas/android-sdk/pull/609
-  private val PERMISSIONS = arrayOf(
-    Manifest.permission.CHANGE_WIFI_STATE,
-    Manifest.permission.ACCESS_WIFI_STATE,
-    Manifest.permission.ACCESS_COARSE_LOCATION,
-    Manifest.permission.ACCESS_FINE_LOCATION,
-    Manifest.permission.INTERNET)
+  // BLUETOOTH_SCAN is a runtime permission since Android 12 (API 31). It is only used for BLE
+  // beacon positioning, so a denial does not block the other positioning sources.
+  // https://github.com/IndoorAtlas/android-sdk/pull/609
+  private val PERMISSIONS: Array<String> = buildList {
+    add(Manifest.permission.CHANGE_WIFI_STATE)
+    add(Manifest.permission.ACCESS_WIFI_STATE)
+    add(Manifest.permission.ACCESS_COARSE_LOCATION)
+    add(Manifest.permission.ACCESS_FINE_LOCATION)
+    add(Manifest.permission.INTERNET)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      add(Manifest.permission.BLUETOOTH_SCAN)
+    }
+  }.toTypedArray()
 
   override fun onStatusChanged(@NonNull provider: String, status: Int, bundle: Bundle?) {
     var mappedStatus = 0;
