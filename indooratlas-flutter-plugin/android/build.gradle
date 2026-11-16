@@ -44,6 +44,9 @@ android {
     }
 }
 
+// The Kotlin Android plugin is intentionally not applied here. When the host app disables
+// built-in Kotlin (android.builtInKotlin=false) the Flutter Gradle plugin applies it to this
+// library before this script is evaluated. Applying it here makes Flutter warn about plugins using KGP.
 kotlin {
     compilerOptions {
         jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
