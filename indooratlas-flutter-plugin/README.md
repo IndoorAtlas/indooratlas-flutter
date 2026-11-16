@@ -17,10 +17,12 @@ indooratlas:
       path: indooratlas-flutter-plugin
 ```
 
-In your `android/app/build.gradle` change:
-`flutter.compileSdkVersion` to `31`
-`flutter.minSdkVersion` to `21`
-`flutter.targetSdkVersion` to `30`
+Requirements: Flutter 3.47 or newer (Dart 3.13+). The Android side is built with
+AGP 9, Gradle 9 and Java 17, and needs `minSdk` 24 or higher (the Flutter default).
+
+Declare these permissions in your app's `android/app/src/main/AndroidManifest.xml`:
+`INTERNET`, `ACCESS_WIFI_STATE`, `CHANGE_WIFI_STATE`, `ACCESS_COARSE_LOCATION`,
+`ACCESS_FINE_LOCATION` and `BLUETOOTH_SCAN`. See `example/` for a working app.
 
 This project is a starting point for a Flutter
 [plug-in package](https://flutter.dev/developing-packages/),

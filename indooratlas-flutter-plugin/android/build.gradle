@@ -2,14 +2,14 @@ group 'com.indooratlas.flutter'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.3.50'
+    ext.kotlin_version = '2.4.0'
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:9.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -17,7 +17,6 @@ buildscript {
 rootProject.allprojects {
     repositories {
         google()
-        jcenter()
         mavenCentral()
         maven {
            url "https://dl.cloudsmith.io/public/indooratlas/mvn-public/maven/"
@@ -26,21 +25,34 @@ rootProject.allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 android {
-    compileSdkVersion 30
+    namespace 'com.indooratlas.flutter'
+    compileSdk 36
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
     }
     defaultConfig {
-        minSdkVersion 16
+        minSdk 24
         consumerProguardFiles 'proguard-rules.pro'
     }
 }
 
+// The Kotlin Android plugin is intentionally not applied here. When the host app disables
+// built-in Kotlin (android.builtInKotlin=false) the Flutter Gradle plugin applies it to this
+// library before this script is evaluated. Applying it here makes Flutter warn about plugins using KGP.
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     implementation 'com.indooratlas.android:indooratlas-android-sdk:3.4.12'
 }
