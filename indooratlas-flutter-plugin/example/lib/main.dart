@@ -6,6 +6,9 @@ import 'package:indooratlas/indooratlas.dart';
 // or enter it in the text field in the app.
 const _defaultApiKey = String.fromEnvironment('INDOORATLAS_API_KEY');
 
+// The plugin rejects keys of any other length.
+const _apiKeyLength = 36;
+
 void main() {
   runApp(const MyApp());
 }
@@ -48,7 +51,14 @@ class _ExamplePageState extends State<ExamplePage> {
 
   void _toggle() {
     final apiKey = _keyController.text.trim();
-    if (!_running && apiKey.isEmpty) return;
+    if (!_running && apiKey.length != _apiKeyLength) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Enter a valid $_apiKeyLength-character API key.'),
+        ),
+      );
+      return;
+    }
     setState(() {
       _running = !_running;
       if (_running) {
@@ -70,7 +80,7 @@ class _ExamplePageState extends State<ExamplePage> {
       'Status: ${_status?.name ?? '-'} $_statusMessage',
       'Trace ID: ${IndoorAtlas.traceId ?? '-'}',
       'Location: ${loc == null ? '-' : '${loc.latitude.toStringAsFixed(6)}, '
-          '${loc.longitude.toStringAsFixed(6)}'}',
+                '${loc.longitude.toStringAsFixed(6)}'}',
       'Accuracy: ${loc?.accuracy.toStringAsFixed(1) ?? '-'} m',
       'Floor: ${loc?.floor ?? '-'}',
       'Heading: ${_heading?.toStringAsFixed(1) ?? '-'}',
@@ -90,7 +100,8 @@ class _ExamplePageState extends State<ExamplePage> {
           _statusMessage = message;
         }),
         onLocation: (location) => setState(() => _location = location),
-        onVenue: (enter, venue) => setState(() => _venue = enter ? venue : null),
+        onVenue: (enter, venue) =>
+            setState(() => _venue = enter ? venue : null),
         onFloorplan: (enter, floorplan) =>
             setState(() => _floorplan = enter ? floorplan : null),
         onHeading: (heading) => setState(() => _heading = heading),
